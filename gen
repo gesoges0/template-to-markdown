@@ -1,15 +1,15 @@
 #!/bin/bash -e
 
-SPEC_FILE=$1
+PARAMETERS_FILE=$1
 TEMPLATE_FILE=$2
 OUTPUT_FILE=$3
 
 SCRIPT_PATH=$(cd $(dirname $0); pwd)
 
 # validate
-if [[  ! -e $SPEC_FILE ]]
+if [[  ! -e $PARAMETERS_FILE ]]
 then
-  echo "$SPEC_FILE does not exists!"
+  echo "$PARAMETERS_FILE does not exists!"
   exit 1
 fi
 
@@ -24,7 +24,7 @@ docker image build . -t generator
 
 # run container
 docker container run --name generator --rm -d --mount type=bind,source="$(pwd),target=/var/generator" generator tail -f /dev/null
-docker container exec generator sh -c "yq . /var/generator/$SPEC_FILE | mustache - /var/generator/$TEMPLATE_FILE /var/generator/$OUTPUT_FILE"
+docker container exec generator sh -c "yq . /var/generator/$PARAMETERS_FILE | mustache - /var/generator/$TEMPLATE_FILE /var/generator/$OUTPUT_FILE"
 docker container stop generator
 
 echo "done!"
